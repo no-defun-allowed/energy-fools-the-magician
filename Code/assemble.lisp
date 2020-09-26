@@ -11,7 +11,7 @@
                                                :fill-pointer 0)
                          :reader basic-block-ordering)))
 
-(defun assemble-hir (initial-instruction compiler-state)
+(defun %assemble-hir (initial-instruction compiler-state)
   (let ((work-list (list (make-instance 'basic-block
                           :initial-instruction initial-instruction))))
     (loop until (null work-list)
@@ -21,6 +21,19 @@
                (setf work-list
                      (append (assemble-basic-block basic-block compiler-state)
                              work-list))))
+    compiler-state))
+
+(defun assign-basic-block-positions (compiler-state)
+  (loop with positions = (basic-block-positions compiler-state)
+        for basic-block across (basic-block-ordering compiler-state)
+        for position = 0 then (+ position (basic-block-length basic-block))
+        do (setf (gethash basic-block positions)
+                 position)))
+
+(defun assemble-hir (initial-instruction)
+  (let ((compiler-state (make-instance 'compiler-state)))
+    (%assemble-hir initial-instruction compiler-state)
+    (assign-basic-block-positions compiler-state)
     compiler-state))
 
 (defvar *compiler*)

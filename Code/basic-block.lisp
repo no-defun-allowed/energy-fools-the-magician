@@ -27,12 +27,14 @@
     (setf (gethash instruction (basic-blocks compiler-state))
           basic-block)
     (loop
+      (print instruction)
       (emit-instruction instruction basic-block compiler-state)
       (multiple-value-bind (ends? successors)
           (ends-basic-block-p instruction)
         (when ends?
           (return-from assemble-basic-block successors))
-        (setf instruction (first (cleavir-ir:successors instruction)))))))
+        (setf instruction (first (cleavir-ir:successors instruction)))
+        (vector-push-extend instruction (hir-instructions basic-block))))))
 
 (defgeneric basic-block-length (basic-block)
   (:method ((basic-block basic-block))
