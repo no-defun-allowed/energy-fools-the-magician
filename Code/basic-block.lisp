@@ -24,6 +24,9 @@
                   collect (make-instance 'basic-block
                            :initial-instruction successor)))))
 
+(defun add-jvm-instruction (basic-block instruction)
+  (vector-push-extend instruction (jvm-instructions basic-block)))
+
 (defun assemble-basic-block (basic-block compiler-state)
   (let ((instruction (initial-instruction basic-block)))
     (setf (gethash instruction (basic-blocks compiler-state))

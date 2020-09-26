@@ -1,10 +1,15 @@
 (in-package :hir-to-jvm)
 
 (defclass compiler-state ()
-  ((lexicals :initform (make-array 0
-                                   :adjustable t
-                                   :fill-pointer 0)
-             :accessor lexicals)
+  ((lexicals :initform (make-array 3
+                        :adjustable t
+                        :fill-pointer 3
+                        :initial-contents '(#:self #:arguments #:dynamic-environment))
+             :reader lexicals)
+   (constants :initform (make-array 0
+                         :adjustable t
+                         :fill-pointer 0)
+              :reader constants)
    (basic-blocks :initform (make-hash-table)
                  :reader basic-blocks)
    (basic-block-positions :initform (make-hash-table)
@@ -41,6 +46,10 @@
     (%assemble-hir initial-instruction compiler-state)
     (assign-basic-block-positions compiler-state)
     compiler-state))
+
+(defun allocate-lexical (location compiler-state)
+  (or (position location (lexicals compiler-state))
+      (vector-push-extend location (lexicals compiler-state))))
 
 (defvar *compiler*)
 (defvar *this-position*)
