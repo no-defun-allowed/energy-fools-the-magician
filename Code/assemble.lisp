@@ -1,7 +1,10 @@
 (in-package :hir-to-jvm)
 
 (defclass compiler-state ()
-  ((lexicals :initform 0 :accessor lexical-count)
+  ((lexicals :initform (make-array 0
+                                   :adjustable t
+                                   :fill-pointer 0)
+             :accessor lexicals)
    (basic-blocks :initform (make-hash-table)
                  :reader basic-blocks)
    (basic-block-positions :initform (make-hash-table)
@@ -10,6 +13,9 @@
                                                :adjustable t
                                                :fill-pointer 0)
                          :reader basic-block-ordering)))
+
+(defun lexical-count (compiler-state)
+  (length (lexicals compiler-state)))
 
 (defun %assemble-hir (initial-instruction compiler-state)
   (let ((work-list (list (make-instance 'basic-block

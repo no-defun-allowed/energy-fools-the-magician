@@ -1,12 +1,12 @@
 public class AFunction implements Function {
     private static Object[] constants;
-    private Object[] closed;
+    public Object[] environment;
     
-    static void initialize(Environment e) {
-        constants = new Object[] {e.lookup("CL", "1+"), e.lookup("CL", "ERROR")};
+    static void initialize(Environment e, Object[] constants) {
+        this.constants = constants;
     }
     
-    public Object[] call(Object[] arguments) {
+    public Object[] call(Object[] arguments, Object[] dynamicEnvironment) {
         return new Object[] {1, 2};
     }
 }

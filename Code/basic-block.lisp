@@ -2,7 +2,9 @@
 
 (defclass basic-block ()
   ((initial-instruction :initarg :initial-instruction
-                        :reader initial-instruction) 
+                        :reader initial-instruction)
+   (final-instruction :reader final-instruction
+                      :accessor %final-instruction)
    (hir-instructions :initform (make-array 1 :adjustable t :fill-pointer 0)
                      :reader hir-instructions)
    (jvm-instructions :initform (make-array 1 :adjustable t :fill-pointer 0)
@@ -19,8 +21,8 @@
   (:method ((instruction cleavir-ir:multiple-successors-mixin))
     (values t
             (loop for successor in (cleavir-ir:successors instruction)
-                  collect (list (make-instance 'basic-block
-                                 :initial-instruction successor))))))
+                  collect (make-instance 'basic-block
+                           :initial-instruction successor)))))
 
 (defun assemble-basic-block (basic-block compiler-state)
   (let ((instruction (initial-instruction basic-block)))
@@ -32,6 +34,7 @@
       (multiple-value-bind (ends? successors)
           (ends-basic-block-p instruction)
         (when ends?
+          (setf (%final-instruction basic-block) instruction)
           (return-from assemble-basic-block successors))
         (setf instruction (first (cleavir-ir:successors instruction)))
         (vector-push-extend instruction (hir-instructions basic-block))))))
