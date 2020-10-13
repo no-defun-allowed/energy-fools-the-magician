@@ -19,11 +19,11 @@
                               appending `(',name ,name))))
      (defmethod instruction-length ((instruction ,name))
        (+ 1 ,@(loop for (name type) in arguments
-                    collect `(type-length ',type))))
+                    collect `(type-length ',type '()))))
      (defmethod render-instruction ((instruction ,name))
        (append (list ,number)
                ,@(loop for (name type) in arguments
-                       collect `(render-value-of-type (,name instruction) ',type))))))
+                       collect `(render-value-of-type (,name instruction) ',type '()))))))
 
 (defmacro define-instructions (&body instructions)
   `(progn
@@ -63,9 +63,9 @@
   
   (constant-byte  #x10 (value byte))
   (constant-short #x11 (value short))
-  (constant       #x12 (index byte))
-  (constant*      #x13 (index short))
-  (long-constant  #x14 (index short))
+  ; (constant       #x12 (value constant))
+  (constant      #x13 (value constant))
+  (long-constant  #x14 (value constant))
   
   (int-local    #x15 (index byte))
   (long-local   #x16 (index byte))
@@ -182,10 +182,10 @@
   (object-return  #xb0)
   (void-return    #xb1)
 
-  (static-ref #xb2 (index short))
-  (static-set #xb3 (index short))
-  (field-ref  #xb4 (index short))
-  (field-set  #xb5 (index short))
+  (static-ref #xb2 (field constant))
+  (static-set #xb3 (field constant))
+  (field-ref  #xb4 (field constant))
+  (field-set  #xb5 (field constant))
   (invoke-virtual   #xb6 (index short))
   (invoke-special   #xb7 (index short))
   (invoke-static    #xb8 (index short))

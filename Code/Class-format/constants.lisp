@@ -4,7 +4,8 @@
   (%render-constant (first c) (rest c)))
 (defgeneric %render-constant (name parts))
 
-(defmethod render-value-of-type (c (type-name (eql 'constant-info)))
+(defmethod render-value-of-type (c (type-name (eql 'constant-info)) arguments)
+  (declare (ignore arguments))
   (render-constant c))
 
 (defmacro define-constant-type (name tag &rest arguments)

@@ -11,11 +11,13 @@
    (methods      :type (pool method) :initarg :methods)
    (attributes   :type (pool attributes) :initarg :attributes)))
    
-(define-record pool (A)
+(define-record pool (element-type)
   ((count :type u2)
-   (records :type (sequence A) :initarg :records)))
+   (records :type (sequence element-type) :initarg :records)))
+(defmethod initialize-instance :after ((pool pool))
+  (setf (count pool) (length records)))
 
-(define-enum access-flags
+(define-enum (access-flags 2)
   (:public     #x0001)
   (:private    #x0002)
   (:protected  #x0004)
