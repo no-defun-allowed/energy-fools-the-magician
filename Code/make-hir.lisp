@@ -23,4 +23,7 @@
                    client cst environment
                    :file-compilation-semantics t))))
          (hir (sicl-ast-to-hir:ast-to-hir client ast)))
+    (cleavir-hir-transformations:eliminate-catches hir)
+    (cleavir-ir:reinitialize-data hir)
+    (cleavir-remove-useless-instructions:remove-useless-instructions hir)
     hir))

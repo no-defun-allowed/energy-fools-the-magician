@@ -20,7 +20,7 @@
             :results (list (cleavir-ir:make-lexical-location '#:nowhere))
             :successors (loop for succ in (cleavir-ast-to-hir:successors context)
                               collect (make-instance 'cleavir-ir:restore-values-instruction
-                                                     :input values-location
+                                                     :dynamic-environment-location values-location
                                                      :successor succ))))
          ;; We compile the "normal" path of unwind-protect as
          ;; unwind-protect -> [protected] -> save-values -> [cleanup] -> restore-values
@@ -32,8 +32,8 @@
          (unwind-context (cleavir-ast-to-hir:clone-context context
                           :results (list (cleavir-ir:make-lexical-location '#:nowhere))
                           :successors (list (make-instance 'cleavir-ir:restore-values-instruction
-                                                           :input unwind-values-location
-                                                           :successor (make-instance 'continue-unwinding-instruction)))))
+                                             :dynamic-environment-location unwind-values-location
+                                             :successor (make-instance 'continue-unwinding-instruction)))))
          (unwind-cleanup (cleavir-ast-to-hir:compile-ast client cleanup-ast
                                                          unwind-context))
          (new-context (cleavir-ast-to-hir:clone-context context
