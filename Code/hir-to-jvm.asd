@@ -9,6 +9,7 @@
                              (:file "constants")))
                (:file "package")
                (:file "make-hir")
+               (:file "unwind-protect")
                (:file "basic-block")
                (:file "assemble")
                (:file "emit-instruction")))

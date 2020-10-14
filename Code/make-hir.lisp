@@ -1,6 +1,9 @@
 (in-package :hir-to-jvm)
 
-(defvar *a-client* (make-instance 'sicl-boot::client))
+(defclass jvm-client (sicl-boot::client)
+  ())
+
+(defvar *a-client* (make-instance 'jvm-client))
 (defvar *an-environment* (sicl-boot:e6 (sicl-boot:boot)))
 
 (defun expression-to-hir (expression environment)
