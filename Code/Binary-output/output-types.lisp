@@ -1,4 +1,4 @@
-(in-package :jvm-opcodes)
+(in-package :jvm-binary-output)
 
 (defmacro define-type (name length (value) &body body)
   (destructuring-bind (name &rest arguments)

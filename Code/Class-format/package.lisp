@@ -1,7 +1,6 @@
 (defpackage :jvm-opcodes
-  (:use :cl)
+  (:use :cl :jvm-binary-output)
+  (:shadow #:method)
   (:export #:instruction
            #:instruction-length
-           #:render-instruction
-           #:type-length
-           #:render-value-of-type))
+           #:render-instruction))

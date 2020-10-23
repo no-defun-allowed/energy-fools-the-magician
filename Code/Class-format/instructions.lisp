@@ -26,6 +26,11 @@
                        collect `(render-value-of-type (,name instruction) ',type '()))))))
 
 (defmacro define-instructions (&body instructions)
+  "Define multiple instructions, with syntax like DEFINE-INSTRUCTION.
+A 'template' syntax is also supported, where names can be of the form
+ (variable name start end base), which defines instructions like
+ (DEFINE-INSTRUCTION <NAME with VARIABLE swapped for N> <BASE + N> ...)
+for N from START to END."
   `(progn
      ,@(loop for (name . rest-of-instruction) in instructions
              if (listp name)
@@ -44,7 +49,9 @@
 
 (define-type signed-byte 1 (x) (list (logand x #xFF)))
 (define-type byte 1 (x) (list x))
-(define-type short 2 (x) (list (ash x 8) (logand x #xFF)))
+(define-type short 2 (x)
+  (list (ldb (byte 8 8) x)
+        (ldb (byte 8 0) x)))
 (define-type signed-short 2 (x)
   (list (ldb (byte 8 8) x)
         (ldb (byte 8 0) x)))
@@ -55,7 +62,7 @@
 
 (define-instructions
   (nop         #x00)
-  (aconst-null #x01)
+  (aconst/null #x01)
   ((@ iconst/@ -1 5 #x03))
   ((@ lconst/@  0 1 #x09))
   ((@ fconst/@  0 2 #x0b))
@@ -159,21 +166,21 @@
   (double-compare  #x97)                ; -1 on NaN
   (double-compare* #x98)                ; 1 on NaN
 
-  (if-=  #x99 (change signed-short))
-  (if-/= #x9a (change signed-short))
-  (if-<  #x9b (change signed-short))
-  (if->= #x9c (change signed-short))
-  (if->  #x9d (change signed-short))
-  (if-<= #x9e (change signed-short))
-  (if-integer-=  #x9f (change signed-short))
-  (if-integer-/= #xa0 (change signed-short))
-  (if-integer-<  #xa1 (change signed-short))
-  (if-integer->= #xa2 (change signed-short))
-  (if-integer->  #xa3 (change signed-short))
-  (if-integer-<= #xa4 (change signed-short))
-  (if-object-=   #xa5 (change signed-short))
-  (if-object-/=  #xa6 (change signed-short))
-  (goto #xa7 (change signed-short))
+  (if-=  #x99 (target instruction))
+  (if-/= #x9a (target instruction))
+  (if-<  #x9b (target instruction))
+  (if->= #x9c (target instruction))
+  (if->  #x9d (target instruction))
+  (if-<= #x9e (target instruction))
+  (if-integer-=  #x9f (target instruction))
+  (if-integer-/= #xa0 (target instruction))
+  (if-integer-<  #xa1 (target instruction))
+  (if-integer->= #xa2 (target instruction))
+  (if-integer->  #xa3 (target instruction))
+  (if-integer-<= #xa4 (target instruction))
+  (if-object-=   #xa5 (target instruction))
+  (if-object-/=  #xa6 (target instruction))
+  (goto #xa7 (target instruction))
 
   (integer-return #xac)
   (long-return    #xad)
@@ -186,9 +193,9 @@
   (static-set #xb3 (field constant))
   (field-ref  #xb4 (field constant))
   (field-set  #xb5 (field constant))
-  (invoke-virtual   #xb6 (index short))
-  (invoke-special   #xb7 (index short))
-  (invoke-static    #xb8 (index short))
+  (invoke-virtual   #xb6 (method constant))
+  (invoke-special   #xb7 (method constant))
+  (invoke-static    #xb8 (method constant))
 
   (new       #xbb (index short))
   (new-array #xbc (element-type byte))
@@ -198,5 +205,5 @@
   (check-cast #xc0 (index short))
   (instance-of #xc1 (index short))
 
-  (if-null #xc6 (change signed-short))
-  (if-not-null #xc7 (change signed-short)))
+  (if-null #xc6 (target instruction))
+  (if-not-null #xc7 (target instruction)))

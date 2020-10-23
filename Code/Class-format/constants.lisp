@@ -1,5 +1,31 @@
 (in-package :jvm-opcodes)
 
+(defstruct constant-pool
+  (vector (make-array 0 :adjustable t :fill-pointer 0))
+  (table  (make-hash-table :test 'equal)))
+
+(defun add-constant-to-pool (constant-pool constant)
+  (let ((index (vector-push-extend constant
+                                   (constant-pool-vector constant-pool))))
+    (setf (gethash constant (constant-pool-table constant-pool)) index)
+    index))
+(defun find-constant-in-pool (constant-pool constant)
+  (multiple-value-bind (index present?)
+      (gethash constant (constant-pool-table constant-pool))
+    (if present?
+        index
+        (add-constant-to-pool constant-pool constant))))
+
+(defvar *constant-pool* (make-constant-pool))
+
+(defmethod render-value-of-type (c (type-name (eql 'constant)) arguments)
+  (declare (ignore arguments))
+  (render-value-of-type (find-constant-in-pool *constant-pool* c)
+                        'short '()))
+(defmethod type-length ((type-name (eql 'constant)) arguments)
+  (declare (ignore arguments))
+  2)
+
 (defun render-constant (c)
   (%render-constant (first c) (rest c)))
 (defgeneric %render-constant (name parts))
@@ -16,13 +42,15 @@
          (list ',name ,@argument-names))
        (defmethod %render-constant ((name (eql ',name)) parts)
          (destructuring-bind ,argument-names parts
-           (list ,tag
-                 ,@(loop for argument-name in argument-names
-                         for type-name in type-names
-                         collect `(render-value-of-type ,argument-name
-                                                        ',type-name))))))))
+           (append (list ,tag)
+                   ,@(loop for argument-name in argument-names
+                           for type-specifier in type-names
+                           for (type-name . type-arguments)
+                             = (alexandria:ensure-list type-specifier)
+                           collect `(render-value-of-type ,argument-name
+                                                          ',type-name ',type-arguments))))))))
 
-(define-constant-type constant-utf8    1 (data constant-string))
+(define-constant-type constant-utf8    1 (data constant))
 (define-constant-type constant-integer 3 (value s4))
 (define-constant-type constant-float   4 (value float))
 (define-constant-type constant-long    5 (value s8))
