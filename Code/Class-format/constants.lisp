@@ -18,20 +18,23 @@
 
 (defvar *constant-pool* (make-constant-pool))
 
-(defmethod render-value-of-type (c (type-name (eql 'constant)) arguments)
+(defmethod render-value-of-type
+    (c (type-name (eql 'constant)) arguments)
   (declare (ignore arguments))
-  (render-value-of-type (1+ (find-constant-in-pool *constant-pool* c))
-                        'short '()))
+  (render-value-of-type
+   (1+ (find-constant-in-pool *constant-pool* c)) 'short '()))
 (defmethod type-length ((type-name (eql 'constant)) arguments)
   (declare (ignore arguments))
   2)
 
-(defmethod render-value-of-type (pool (type-name (eql 'constant-pool)) arguments)
+(defmethod render-value-of-type
+    (pool (type-name (eql 'constant-pool)) arguments)
   (declare (ignore arguments))
   (loop with vector = (constant-pool-vector pool)
         for position from 0
         until (= position (length vector))
-        collect (render-value-of-type (aref vector position) 'constant-info '())
+        collect (render-value-of-type
+                 (aref vector position) 'constant-info '())
           into values
         finally (return (cons (render-value-of-type (1+ (length vector))
                                                     'short '())
@@ -41,7 +44,8 @@
   (%render-constant (first c) (rest c)))
 (defgeneric %render-constant (name parts))
 
-(defmethod render-value-of-type (c (type-name (eql 'constant-info)) arguments)
+(defmethod render-value-of-type
+    (c (type-name (eql 'constant-info)) arguments)
   (declare (ignore arguments))
   (render-constant c))
 
@@ -59,10 +63,11 @@
                           for type-specifier in type-names
                           for (type-name . type-arguments)
                             = (alexandria:ensure-list type-specifier)
-                          collect `(render-value-of-type ,argument-name
-                                                         ',type-name ',type-arguments)))))))))
+                          collect `(render-value-of-type
+                                    ,argument-name ',type-name ',type-arguments)))))))))
 
-(defmethod render-value-of-type (string (type-name (eql 'string)) arguments)
+(defmethod render-value-of-type
+    (string (type-name (eql 'string)) arguments)
   (declare (ignore arguments))
   (let ((bytes (babel:string-to-octets string :encoding :utf-8)))
     (list (render-value-of-type (length bytes) 'short '())

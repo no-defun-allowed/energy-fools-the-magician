@@ -6,11 +6,11 @@
                 :components ((:file "package")
                              (:file "output-types")
                              (:file "define-record")
+                             (:file "integer-types")
                              (:file "iolist")))
                (:module "Class-format"
                 :serial t
                 :components ((:file "package")
-                             (:file "integer-types")
                              (:file "instructions")
                              (:file "constants")
                              (:file "class-file")))

@@ -1,14 +1,14 @@
-(let* ((jvm-opcodes:*constant-pool* (jvm-opcodes:make-constant-pool))
+(let* ((jvm-constants:*constant-pool* (jvm-constants:make-constant-pool))
        (class-file
          (make-instance 'jvm-opcodes:class-file
                         :attributes #()
                         :methods #()
                         :fields #()
                         :interfaces #()
-                        :super-class (jvm-opcodes:class-named "java/lang/Object")
-                        :this-class  (jvm-opcodes:class-named "GoodMorningBeach")
+                        :super-class (jvm-constants:class-named "java/lang/Object")
+                        :this-class  (jvm-constants:class-named "GoodMorningBeach")
                         :access-flags '(:public)
-                        :constant-pool jvm-opcodes:*constant-pool*))
+                        :constant-pool jvm-constants:*constant-pool*))
        (iolist (jvm-binary-output:render-value-of-type class-file
                                                        'jvm-opcodes:class-file '())))
   (with-open-file (s "/tmp/GoodMorningBeach.class"

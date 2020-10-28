@@ -5,13 +5,13 @@
    (minor-version :type short :initform 0)
    (major-version :type short :initform 52)
    (access-flags :type access-flags :initarg :access-flags)
-   (this-class   :type constant :initarg :this-class)
-   (super-class  :type constant :initarg :super-class)
-   (interfaces   :type (pool constant) :initarg :interfaces)
+   (this-class   :type jvm-constants:constant :initarg :this-class)
+   (super-class  :type jvm-constants:constant :initarg :super-class)
+   (interfaces   :type (pool jvm-constants:constant) :initarg :interfaces)
    (fields       :type (pool field) :initarg :fields)
    (methods      :type (pool method) :initarg :methods)
    (attributes   :type (pool attributes) :initarg :attributes)
-   (constant-pool :type constant-pool :initarg :constant-pool))
+   (constant-pool :type jvm-constants:constant-pool :initarg :constant-pool))
   :order (magic minor-version major-version
           constant-pool access-flags
           this-class super-class
