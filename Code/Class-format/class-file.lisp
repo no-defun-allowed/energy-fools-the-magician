@@ -1,23 +1,30 @@
 (in-package :jvm-opcodes)
 
 (define-record class-file ()
-  (magic         :type u4 :initform #xcafebabe)
-  (minor-version :type u2 :initform 0)
-  (major-version :type u2 :initform 52)
-  (constant-pool :type (pool constant-info) :initarg :constant-pool)
-  (access-flags :type access-flags :initarg :access-flags)
-  (this-class   :type constant :initarg :this-class)
-  (super-class  :type constant :initarg :super-class)
-  (interfaces   :type (pool interface) :initarg :interfaces)
-  (fields       :type (pool field) :initarg :fields)
-  (methods      :type (pool method) :initarg :methods)
-  (attributes   :type (pool attributes) :initarg :attributes))
-   
-(define-record pool (element-type)
-  ((count :type u2)
-   (records :type (sequence element-type) :initarg :records)))
-(defmethod initialize-instance :after ((pool pool))
-  (setf (count pool) (length records)))
+  ((magic         :type int   :initform #xcafebabe)
+   (minor-version :type short :initform 0)
+   (major-version :type short :initform 52)
+   (access-flags :type access-flags :initarg :access-flags)
+   (this-class   :type constant :initarg :this-class)
+   (super-class  :type constant :initarg :super-class)
+   (interfaces   :type (pool constant) :initarg :interfaces)
+   (fields       :type (pool field) :initarg :fields)
+   (methods      :type (pool method) :initarg :methods)
+   (attributes   :type (pool attributes) :initarg :attributes)
+   (constant-pool :type constant-pool :initarg :constant-pool))
+  :order (magic minor-version major-version
+          constant-pool access-flags
+          this-class super-class
+          interfaces fields methods attributes))
+
+(defmethod render-value-of-type (sequence (type-name (eql 'pool)) arguments)
+  (destructuring-bind (element-type) arguments
+    (let ((elements
+            (map 'list (lambda (element)
+                         (render-value-of-type element element-type '()))
+                 sequence)))
+      (cons (render-value-of-type (length sequence) 'short '())
+            elements))))
 
 (define-enum (access-flags 2)
   (:public     #x0001)

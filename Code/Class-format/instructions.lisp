@@ -47,14 +47,6 @@ for N from START to END."
              else
                collect `(define-instruction ,name ,@rest-of-instruction))))
 
-(define-type signed-byte 1 (x) (list (logand x #xFF)))
-(define-type byte 1 (x) (list x))
-(define-type short 2 (x)
-  (list (ldb (byte 8 8) x)
-        (ldb (byte 8 0) x)))
-(define-type signed-short 2 (x)
-  (list (ldb (byte 8 8) x)
-        (ldb (byte 8 0) x)))
 (define-type instruction 2 (i)
   (render-value-of-type (- (instruction-position i *compiler*)
                            *this-position*)

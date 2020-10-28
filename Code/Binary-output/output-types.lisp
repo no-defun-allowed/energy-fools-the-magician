@@ -16,14 +16,17 @@
 
 (defmacro define-enum ((name bytes) &body body)
   `(progn
-     (defmethod type-length ((type-name (eql ',name))) ,byte)
-     (defmethod render-value-of-type (value (type-name (eql ',name)))
+     (defmethod type-length ((type-name (eql ',name)) arguments)
+       (declare (ignore arguments))
+       ,bytes)
+     (defmethod render-value-of-type (value (type-name (eql ',name)) arguments)
+       (declare (ignore arguments))
        (let ((bit-alist ',body)
-             (value 0))
+             (integer 0))
          (dolist (flag value)
            (let ((pair (assoc flag bit-alist)))
              (if (null pair)
                  (error "unknown flag for ~s: ~s" ',name flag)
-                 (setf value (logior value (second pair))))))
-         (loop for byte from ,bytes downto 0
-               collect (ldb (byte 8 (* byte 8)) value))))))
+                 (setf integer (logior integer (second pair))))))
+         (loop for byte from ,(1- bytes) downto 0
+               collect (ldb (byte 8 (* byte 8)) integer))))))

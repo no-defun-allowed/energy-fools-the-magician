@@ -4,4 +4,5 @@
            #:render-value-of-type
            #:define-type
            #:define-record
-           #:define-enum))
+           #:define-enum
+           #:write-io-list))
