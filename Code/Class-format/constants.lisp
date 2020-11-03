@@ -18,6 +18,11 @@
 
 (defvar *constant-pool* (make-constant-pool))
 
+(defmacro with-constant-pool (() &body body)
+  "Bind *CONSTANT-POOL* to a fresh constant pool while evaluating the forms in BODY."
+  `(let ((*constant-pool* (make-constant-pool)))
+     ,@body))
+
 (defmethod render-value-of-type
     (c (type-name (eql 'constant)) arguments)
   (declare (ignore arguments))

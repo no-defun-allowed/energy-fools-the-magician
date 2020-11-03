@@ -13,13 +13,18 @@
                  `',part)))
       `(,(process name) (list ,@(mapcar #'process arguments))))))
 
+(defmacro define-record* (name slots &key (superclasses '()))
+  `(defclass ,name ,superclasses
+     ,(mapcar #'process-record-slot slots)))
+
 (defmacro define-record (name type-variables slots
-                         &key (order (mapcar #'first slots)))
+                         &key (order (mapcar #'first slots))
+                              (superclasses '())
+                              (output-type name))
   (let ((rendered-table (make-hash-table)))
     `(progn
-       (defclass ,name ()
-         ,(mapcar #'process-record-slot slots))
-       (defmethod render-value-of-type (value (type-name (eql ',name)) arguments)
+       (define-record* ,name ,slots :superclasses ,superclasses)
+       (defmethod render-value-of-type (value (type-name (eql ',output-type)) arguments)
          (declare (ignore arguments))
          (let ,(loop for (slot-name . slot-plist) in slots
                      for type = (getf slot-plist :type)

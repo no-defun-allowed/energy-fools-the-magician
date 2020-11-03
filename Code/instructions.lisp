@@ -14,6 +14,11 @@
 (defgeneric instruction-length (instruction))
 (defgeneric render-instruction (instruction))
 
+(defmethod jvm-binary-output:render-value-of-type
+    (instruction (type (eql 'instruction)) arguments)
+  (declare (ignore arguments))
+  (render-instruction instruction))
+
 (defmacro define-instruction (name number &rest arguments)
   `(progn
      (export ',name)
@@ -101,7 +106,7 @@
   (object-set #x3a (index byte))
 
   ((@ int-set/@    #x3b 0 3))
-  ((@ load-set/@   #x3f 0 3))
+  ((@ long-set/@   #x3f 0 3))
   ((@ float-set/@  #x43 0 3))
   ((@ double-set/@ #x47 0 3))
   ((@ object-set/@ #x4b 0 3))

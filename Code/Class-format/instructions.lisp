@@ -47,11 +47,6 @@ for N from START to END."
              else
                collect `(define-instruction ,name ,@rest-of-instruction))))
 
-(define-type instruction 2 (i)
-  (render-value-of-type (- (instruction-position i *compiler*)
-                           *this-position*)
-                        'signed-short))
-
 (define-instructions
   (nop         #x00)
   (aconst/null #x01)
@@ -158,21 +153,21 @@ for N from START to END."
   (double-compare  #x97)                ; -1 on NaN
   (double-compare* #x98)                ; 1 on NaN
 
-  (if-=  #x99 (target instruction))
-  (if-/= #x9a (target instruction))
-  (if-<  #x9b (target instruction))
-  (if->= #x9c (target instruction))
-  (if->  #x9d (target instruction))
-  (if-<= #x9e (target instruction))
-  (if-integer-=  #x9f (target instruction))
-  (if-integer-/= #xa0 (target instruction))
-  (if-integer-<  #xa1 (target instruction))
-  (if-integer->= #xa2 (target instruction))
-  (if-integer->  #xa3 (target instruction))
-  (if-integer-<= #xa4 (target instruction))
-  (if-object-=   #xa5 (target instruction))
-  (if-object-/=  #xa6 (target instruction))
-  (goto #xa7 (target instruction))
+  (if-=  #x99 (target address))
+  (if-/= #x9a (target address))
+  (if-<  #x9b (target address))
+  (if->= #x9c (target address))
+  (if->  #x9d (target address))
+  (if-<= #x9e (target address))
+  (if-integer-=  #x9f (target address))
+  (if-integer-/= #xa0 (target address))
+  (if-integer-<  #xa1 (target address))
+  (if-integer->= #xa2 (target address))
+  (if-integer->  #xa3 (target address))
+  (if-integer-<= #xa4 (target address))
+  (if-object-=   #xa5 (target address))
+  (if-object-/=  #xa6 (target address))
+  (goto #xa7 (target address))
 
   (integer-return #xac)
   (long-return    #xad)
@@ -197,5 +192,5 @@ for N from START to END."
   (check-cast #xc0 (index short))
   (instance-of #xc1 (index short))
 
-  (if-null #xc6 (target instruction))
-  (if-not-null #xc7 (target instruction)))
+  (if-null #xc6 (target address))
+  (if-not-null #xc7 (target address)))

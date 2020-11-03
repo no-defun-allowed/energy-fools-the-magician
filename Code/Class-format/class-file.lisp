@@ -1,4 +1,4 @@
-(in-package :jvm-opcodes)
+(in-package :jvm-class-format)
 
 (define-record class-file ()
   ((magic         :type int   :initform #xcafebabe)
@@ -18,12 +18,12 @@
           interfaces fields methods attributes))
 
 (defmethod render-value-of-type (sequence (type-name (eql 'pool)) arguments)
-  (destructuring-bind (element-type) arguments
+  (destructuring-bind (element-type &optional (length-type 'short)) arguments
     (let ((elements
             (map 'list (lambda (element)
                          (render-value-of-type element element-type '()))
                  sequence)))
-      (cons (render-value-of-type (length sequence) 'short '())
+      (cons (render-value-of-type (length sequence) length-type '())
             elements))))
 
 (define-enum (access-flags 2)
