@@ -4,10 +4,19 @@
   (vector (make-array 0 :adjustable t :fill-pointer 0))
   (table  (make-hash-table :test 'equal)))
 
+(defstruct bogus-entry)
+
 (defun add-constant-to-pool (constant-pool constant)
   (let ((index (vector-push-extend constant
                                    (constant-pool-vector constant-pool))))
     (setf (gethash constant (constant-pool-table constant-pool)) index)
+    ;; JVM spec 4.4.5:
+    ;; "If a CONSTANT_Long_info or CONSTANT_Double_info structure is the entry
+    ;; at index n in the constant_pool table, then the next usable entry in the
+    ;; table is located at index n+2."
+    (when (member (car constant) '(constant-double constant-long))
+      (vector-push-extend (make-bogus-entry)
+                          (constant-pool-vector constant-pool)))
     index))
 (defun find-constant-in-pool (constant-pool constant)
   (multiple-value-bind (index present?)
@@ -54,6 +63,11 @@
   (declare (ignore arguments))
   (render-constant c))
 
+(defmethod render-value-of-type
+    ((c bogus-entry) (type-name (eql 'constant-info)) arguments)
+  (declare (ignore arguments))
+  '())
+
 (defmacro define-constant-type (name tag &rest arguments)
   (let ((argument-names (mapcar #'first  arguments))
         (type-names     (mapcar #'second arguments)))
@@ -94,3 +108,11 @@
 
 (defun class-named (name)
   (constant-class (constant-utf8 name)))
+(defun field (class-name name type)
+  (constant-field (class-named class-name)
+                  (constant-name-and-type (constant-utf8 name)
+                                          (constant-utf8 type))))
+(defun method (class-name name type)
+  (constant-method (class-named class-name)
+                   (constant-name-and-type (constant-utf8 name)
+                                           (constant-utf8 type))))

@@ -17,6 +17,12 @@
        (make-instance ',name
                       ,@(loop for (name type) in arguments
                               appending `(',name ,name))))
+     (defmethod print-object ((instruction ,name) stream)
+       (print-unreadable-object (instruction stream :type t)
+         ,@(loop for ((name) . rest) on arguments
+                 collect `(prin1 (,name instruction) stream)
+                 unless (null rest)
+                   collect `(write-char #\Space stream))))
      (defmethod instruction-length ((instruction ,name))
        (+ 1 ,@(loop for (name type) in arguments
                     collect `(type-length ',type '()))))
@@ -147,6 +153,8 @@ for N from START to END."
   (long-xor    #x83)
   (integer-incf #x84 (index byte) (change signed-byte))
 
+  (long->int #x88)
+  
   (long-compare    #x94)
   (float-compare   #x95)                ; -1 on NaN
   (float-compare*  #x96)                ; 1 on NaN
@@ -184,9 +192,9 @@ for N from START to END."
   (invoke-special   #xb7 (method constant))
   (invoke-static    #xb8 (method constant))
 
-  (new       #xbb (index short))
+  (new       #xbb (element-type constant))
   (new-array #xbc (element-type byte))
-  (new-object-array #xbd (index short))
+  (new-object-array #xbd (element-type constant))
   (array-length #xbe)
   (throw-exception #xbf)
   (check-cast #xc0 (index short))
